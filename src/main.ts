@@ -4,10 +4,11 @@ import cookieParser from 'cookie-parser';
 import {parseEnvOrigins} from './utils/parse-env-origins.js';
 import {ValidationPipe} from '@nestjs/common';
 import {VersioningType} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-const getCorsAllowedList = () => {
+const getCorsAllowedList = (config: ConfigService) => {
   return parseEnvOrigins(
-    process.env.CLIENT_URL
+    config.get<string>('CLIENT_URL')
   );
 }
 
@@ -15,7 +16,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
 
-  const allowedOrigins = getCorsAllowedList();
+  const config = app.get(ConfigService);
+
+  const allowedOrigins = getCorsAllowedList(config);
   app.enableCors({
     origin: (requestOrigin: string, callback: any) => {
       if(!requestOrigin) {
@@ -55,6 +58,6 @@ async function bootstrap() {
     defaultVersion: '1'
   }
   )
-  await app.listen(process.env.PORT ?? 8080);
+  await app.listen(config.get('PORT') ?? 8080);
 }
 await bootstrap();
