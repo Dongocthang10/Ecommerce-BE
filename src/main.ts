@@ -5,6 +5,7 @@ import {parseEnvOrigins} from './utils/parse-env-origins.js';
 import {ValidationPipe} from '@nestjs/common';
 import {VersioningType} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {Logger} from 'nestjs-pino';
 
 const getCorsAllowedList = (config: ConfigService) => {
   return parseEnvOrigins(
@@ -13,10 +14,12 @@ const getCorsAllowedList = (config: ConfigService) => {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {bufferLogs: true});
+  app.useLogger(app.get(Logger));
   app.use(cookieParser());
 
   const config = app.get(ConfigService);
+  const logger = app.get(Logger);
 
   const allowedOrigins = getCorsAllowedList(config);
   app.enableCors({
@@ -30,6 +33,8 @@ async function bootstrap() {
         callback(null, true);
         return;
       }
+
+      logger.warn(`CORS request from origin ${requestOrigin} is not allowed`);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
@@ -58,6 +63,8 @@ async function bootstrap() {
     defaultVersion: '1'
   }
   )
+  const port = config.get('PORT') ?? 8080;
   await app.listen(config.get('PORT') ?? 8080);
+  logger.log(`Server is running on port ${port}`);
 }
 await bootstrap();
