@@ -1,29 +1,35 @@
-import {z} from 'zod';
+import { z } from 'zod';
 
 export const envSchema = z.object({
-    NODE_ENV: z
+  NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
-    PORT: z.coerce.number().default(8080),
-    DB_HOST: z.string().default('localhost'),
-    DB_PORT: z.coerce.number().default(5432),
-    DB_USERNAME: z.string().default('ecommerce-postgres'),
-    DB_PASSWORD: z.string().min(6).default('password'),
-    DB_NAME: z.string().min(6).default('ecommerce-db'),
+  PORT: z.coerce.number().default(8080),
+  DB_HOST: z.string().trim().min(1),
+  DB_PORT: z.coerce.number().default(5432),
+  DB_USERNAME: z.string().trim().min(1),
+  DB_PASSWORD: z.string().min(1),
+  DB_NAME: z.string().trim().min(1),
 
-    THROTTLER_TTL_MS: z.coerce.number().default(1000),
-    THROTTLER_LIMIT: z.coerce.number().default(10)
-})
+  THROTTLER_TTL_MS: z.coerce.number().default(1000),
+  THROTTLER_LIMIT: z.coerce.number().default(10),
+  DB_POOL_MAX: z.coerce.number().default(20),
+  DB_POOL_MIN: z.coerce.number().default(2),
+  DB_POOL_CONNECTION_TIMEOUT_MS: z.coerce.number().default(5000),
+  DB_POOL_IDLE_TIMEOUT_MS: z.coerce.number().default(30000),
+});
 
 export type Env = z.infer<typeof envSchema>;
 
 export function validateEnv(env: Record<string, unknown>): Env {
-    const parsed = envSchema.safeParse(env);
+  const parsed = envSchema.safeParse(env);
 
-    if(!parsed.success) {
-        const issues = parsed.error.issues.map((i) => ` - ${i.path.join('.')} : ${i.message}`).join('/n');
-        throw new Error(`Invalid environment configuration:\n${issues}`);
-    }
+  if (!parsed.success) {
+    const issues = parsed.error.issues
+      .map((i) => ` - ${i.path.join('.')} : ${i.message}`)
+      .join('/n');
+    throw new Error(`Invalid environment configuration:\n${issues}`);
+  }
 
-    return parsed.data;
+  return parsed.data;
 }
