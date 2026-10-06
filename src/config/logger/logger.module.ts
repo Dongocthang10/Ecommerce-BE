@@ -23,6 +23,15 @@ import { IncomingMessage } from 'http';
                   },
                 }
               : undefined,
+
+            genReqId: (req, res) => {
+                const existing = req.headers['x-request-id']
+                const id = existing ?? crypto.randomUUID();
+                // req.headers['x-request-id'] = id;
+                res.setHeader('x-request-id', id);
+
+                return id;
+            } ,
             redact: {
               paths: [
                 'req.headers.authorization',
