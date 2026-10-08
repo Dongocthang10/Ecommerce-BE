@@ -10,6 +10,8 @@ import { AllExceptionFilter } from './core/filters/all-exception.filter.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { cfgLoad } from './config/configuration.js';
 import { TypeOrmConfigService } from './config/database/typeorm-config.service.js';
+import { UserModule } from './app/user/user.module.js';
+import { AuthModule } from './app/auth/auth.module.js';
 const envFile = process.env.NODE_ENV === 'production' 
 ? ['.env.prod', '.env'] : ['.env.dev', 'env']
 
@@ -27,7 +29,9 @@ const envFile = process.env.NODE_ENV === 'production'
     AppThrottlerModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService
-    })
+    }),
+    UserModule,
+    AuthModule
   ],
   providers: [
     {

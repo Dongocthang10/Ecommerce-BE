@@ -12,10 +12,12 @@ export default new DataSource({
   port: parseInt(process.env.DB_PORT ?? '5432', 10),
   username: process.env.DB_USERNAME ?? 'postgres',
   password: process.env.DB_PASSWORD ?? 'abc123',
-  name: process.env.DB_NAME ?? 'postgres',
+  database: process.env.DB_NAME ?? 'ecommerce-db',
+
   entities: ['src/**/*.entity.ts'],
-  migrations: ['src/migrations/*/ts'],
+  migrations: ['src/migrations/*.ts'],
+
   namingStrategy: new SnakeNamingStrategy(),
   synchronize: false,
-  logging: true
+  logging: true,
 });
