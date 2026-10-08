@@ -13,6 +13,7 @@ import { TypeOrmConfigService } from './config/database/typeorm-config.service.j
 import { UserModule } from './app/user/user.module.js';
 import { AuthModule } from './app/auth/auth.module.js';
 import { AddressModule } from './app/address/address.module.js';
+import { CategoryModule } from './app/category/category.module.js';
 const envFile = process.env.NODE_ENV === 'production' 
 ? ['.env.prod', '.env'] : ['.env.dev', 'env']
 
@@ -33,7 +34,8 @@ const envFile = process.env.NODE_ENV === 'production'
     }),
     UserModule,
     AuthModule,
-    AddressModule
+    AddressModule,
+    CategoryModule
   ],
   providers: [
     {
