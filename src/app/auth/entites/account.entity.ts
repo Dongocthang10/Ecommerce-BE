@@ -37,6 +37,6 @@ export class Account extends BaseUuidEntity {
     password: string | null
 
     @ManyToOne(() => User, {onDelete: "CASCADE"})
-    @JoinColumn({ name: 'userId'})
+    @JoinColumn({ name: 'user_id'})
     user: User
 }

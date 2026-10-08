@@ -12,6 +12,7 @@ import { cfgLoad } from './config/configuration.js';
 import { TypeOrmConfigService } from './config/database/typeorm-config.service.js';
 import { UserModule } from './app/user/user.module.js';
 import { AuthModule } from './app/auth/auth.module.js';
+import { AddressModule } from './app/address/address.module.js';
 const envFile = process.env.NODE_ENV === 'production' 
 ? ['.env.prod', '.env'] : ['.env.dev', 'env']
 
@@ -31,7 +32,8 @@ const envFile = process.env.NODE_ENV === 'production'
       useClass: TypeOrmConfigService
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    AddressModule
   ],
   providers: [
     {
