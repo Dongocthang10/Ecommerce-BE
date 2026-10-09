@@ -16,6 +16,7 @@ import { AddressModule } from './app/address/address.module.js';
 import { CategoryModule } from './app/category/category.module.js';
 import { ProductModule } from './app/product/product.module.js';
 import { ProductImageModule } from './app/product-image/product-image.module.js';
+import { EmailModule } from './app/email/email.module.js';
 const envFile = process.env.NODE_ENV === 'production' 
 ? ['.env.prod', '.env'] : ['.env.dev', 'env']
 
@@ -39,7 +40,8 @@ const envFile = process.env.NODE_ENV === 'production'
     AddressModule,
     CategoryModule,
     ProductModule,
-    ProductImageModule
+    ProductImageModule,
+    EmailModule
   ],
   providers: [
     {
