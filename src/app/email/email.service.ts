@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PinoLogger, InjectPinoLogger, Logger } from 'nestjs-pino';
+import { PinoLogger } from 'nestjs-pino';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 export interface EmailOption {
@@ -14,8 +14,9 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
   constructor(
     private configService: ConfigService,
-    @InjectPinoLogger(EmailService.name) private readonly Logger: PinoLogger,
+    private readonly logger: PinoLogger
   ) {
+    this.logger.setContext(EmailService.name);
     this.createTransporter();
   }
 
@@ -34,9 +35,9 @@ export class EmailService {
   private async verifyConnection() {
     try {
       await this.transporter.verify();
-      this.Logger.info({ msg: 'email.smtp.connected' });
+      this.logger.info({ msg: 'email.smtp.connected' });
     } catch (error) {
-      this.Logger.error({ msg: 'email.smtp.connectionFailed' });
+      this.logger.error({ msg: 'email.smtp.connectionFailed' });
     }
   }
 
@@ -51,7 +52,7 @@ export class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      this.Logger.info({
+      this.logger.info({
         msg: 'email.sent',
         messageId: info.messageId,
         subject: options.subject,
@@ -59,7 +60,7 @@ export class EmailService {
 
       return true;
     } catch (error) {
-      this.Logger.error({
+      this.logger.error({
         msg: 'email.sendFailed',
         subject: options.subject,
         error: (error as Error).message,
