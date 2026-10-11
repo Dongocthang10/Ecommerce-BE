@@ -1,0 +1,56 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Verification } from './entites/verification.entity.js';
+import { Repository } from 'typeorm';
+import { PinoLogger } from 'nestjs-pino';
+import { UserService } from '../user/user.service.js';
+
+@Injectable()
+export class AuthService {
+    constructor(
+        @InjectRepository(Verification)
+        private readonly verificationRepository: Repository<Verification>,
+        private readonly logger: PinoLogger,
+        private readonly userService: UserService
+    ) {
+        this.logger.setContext(AuthService.name)
+    }
+    async verifyEmailCustom(
+        token: string,
+        email: string
+    ) {
+        const record = await this.verificationRepository.findOne({
+            where: {value: token}
+        })
+
+        if(!record) {
+            this.logger.warn({msg: 'auth.verify.tokenNotFound', email});
+            throw new BadRequestException('Invalid token');
+        }
+
+        if (record.expiresAt.getTime() < Date.now()) {
+            await this.verificationRepository.delete({
+                id: record.id
+            });
+
+            this.logger.warn({msg: 'auth.veriry.tokenExpired', email});
+            throw new BadRequestException('Token expired');
+        }
+
+        if (record.identifier.toLowerCase() !== email.toLowerCase()) {
+            this.logger.warn({msg: 'Invalid Email'}, email);
+            throw new BadRequestException('Invalid email')
+        }
+
+        await this.userService.verifyUser(email);
+        await this.verificationRepository.delete({id: record.id})
+
+        this.logger.info({ msg: 'auth.email.verified', email});
+
+        return {
+            success: true,
+            message: 'Verified email successfully!',
+            // user: null
+        }
+    }
+}

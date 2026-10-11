@@ -6,7 +6,7 @@ import { APP_CONFIG } from "../config/app/app.config.js";
 import { ConfigService } from "@nestjs/config";
 
 export function setupApp (app: NestExpressApplication, logger: Logger, config: ConfigService) {
-    app.use(cookieParser);
+    app.use(cookieParser());
     const appCfg = config.getOrThrow<{corsOrigins: string[]}>(APP_CONFIG)
     const allowedOrigins = appCfg.corsOrigins;
       app.enableCors({

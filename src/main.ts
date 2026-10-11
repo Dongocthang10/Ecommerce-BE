@@ -12,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
+  app.setGlobalPrefix('api');
   app.useLogger(app.get(Logger));
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Ecommerce APIs')
